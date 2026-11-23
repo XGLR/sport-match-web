@@ -73,13 +73,13 @@ export function buildResultAnalysis(result, conditions, data) {
   const primary = result.primary;
   const preferenceFirst = result.ranked?.[0];
   const fallback = primary && preferenceFirst && preferenceFirst.id !== primary.id;
-  let lead = '当前条件下，没有一个类型能提供两个符合选择的入门项目。下面保留你的偏好分析，方便调整条件时参考。';
+  let lead = '当前条件下，没有找到符合选择的运动。下面保留你的偏好分析，方便调整条件时参考。';
   const matchReasons = [];
 
   if (primary) {
     lead = fallback
       ? `结合你能安排的条件，建议先体验${primary.name}。偏好上更接近${preferenceFirst.name}，当前先选能实际开展的方向。`
-      : `你的回答较接近${primary.name}，可以先从下面符合条件的入门项目试起。`;
+      : `你的回答较接近${primary.name}，可以看看下面符合条件的运动。`;
     const closest = data.dimensions.map((dimension, index) => ({
       id: dimension.id,
       index,
@@ -87,7 +87,7 @@ export function buildResultAnalysis(result, conditions, data) {
     })).sort((a, b) => a.gap - b.gap || a.index - b.index).slice(0, 2);
     matchReasons.push(...closest.map(dimension => dimensionNotes[dimension.index].description));
     matchReasons.push(typeReasons[primary.id] || primary.profile);
-    if (fallback) matchReasons.push(`原先更接近的${preferenceFirst.name}在当前条件下不足两个可推荐项目，因此顺次选择了${primary.name}。`);
+    if (fallback) matchReasons.push(`原先更接近的${preferenceFirst.name}在当前条件下没有符合要求的运动，因此顺次选择了${primary.name}。`);
   } else {
     matchReasons.push('项目需要同时符合时间、场地、预算和排除项，当前组合留下的选择不足。');
   }

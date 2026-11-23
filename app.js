@@ -25,11 +25,16 @@ function valid(q){const v=(state.step>=data.questions.length?state.conditions:st
 let result;
 function recommendationGroups(result){
  const ids=new Set(),names=new Set();
- const ordered=[...(result.sports||[]),...(result.alternatives||[])].filter(s=>{
+ const currentSports=new Map(data.types.flatMap(type=>type.sports.map(s=>[s.id,s])));
+ const ordered=[...(result.sports||[]),...(result.alternatives||[])].map(s=>{
+  const current=currentSports.get(s?.id);
+  return current?{...s,name:current.name,sportId:current.sportId,priority:current.priority}:s;
+ }).filter(s=>{
   if(!s?.name)return false;
   const name=s.name.trim();
-  if(!name||names.has(name)||(s.id&&ids.has(s.id)))return false;
-  names.add(name);if(s.id)ids.add(s.id);return true;
+  const id=s.sportId||s.id;
+  if(!name||names.has(name)||(id&&ids.has(id)))return false;
+  names.add(name);if(id)ids.add(id);return true;
  });
  const currentPriorities=new Map(data.types.flatMap(type=>type.sports.map(s=>[s.id,s.priority])));
  const priority=s=>s.priority??currentPriorities.get(s.id)??1;
@@ -43,7 +48,7 @@ function resultView(){
  result=state.result;
  if(!result){app.innerHTML='<section class="empty"><h1>还有问题没答完</h1><p>回到测试，把遗漏的选项补上。</p><button class="primary" data-action="start">回到测试</button></section>';return;}
  const type=result.primary;
- if(!type){app.innerHTML='<section class="empty"><div class="eyebrow">YOUR NEXT STEP</div><h1>先调整一下尝试条件</h1><p>按当前选项，还凑不出两项合适的运动。可以回到条件部分，看看时间和场地有没有其他安排。</p><button class="primary" data-action="conditions">修改日常条件</button><p>有活动限制时，先确认适合自己的动作范围。</p></section>';return;}
+ if(!type){app.innerHTML='<section class="empty"><div class="eyebrow">YOUR NEXT STEP</div><h1>先调整一下尝试条件</h1><p>按当前选项，还没有符合条件的运动。可以回到条件部分，看看时间和场地有没有其他安排。</p><button class="primary" data-action="conditions">修改日常条件</button><p>有活动限制时，先确认适合自己的动作范围。</p></section>';return;}
  const dims=Array.isArray(data.dimensions)?data.dimensions:Object.entries(data.dimensions).map(([id,v])=>({id,name:v.name||v}));
  const analysis=buildResultAnalysis(result,result.conditions||{},data);
  const recommendations=recommendationGroups(result);

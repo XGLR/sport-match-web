@@ -35,24 +35,27 @@ export function scoreQuiz(answers, conditions, data) {
     && !(conditions.limits !== 'none' && sport.flags.some(flag => restrictedFlags.has(flag)));
 
   const byPriority = (a, b) => (a.priority ?? 1) - (b.priority ?? 1);
+  const sportIdentity = sport => sport.sportId ?? sport.id;
 
   for (const type of ranked) {
     const seen = new Set();
-    const sports = type.sports.filter(eligible).filter(sport => {
-      if (seen.has(sport.id)) return false;
-      seen.add(sport.id);
+    const sports = type.sports.filter(eligible).sort(byPriority).filter(sport => {
+      const identity = sportIdentity(sport);
+      if (seen.has(identity)) return false;
+      seen.add(identity);
       return true;
-    }).sort(byPriority);
-    if (sports.length >= 2) {
+    });
+    if (sports.length >= 1) {
       const primarySports = sports.slice(0, 6);
-      const selected = new Set(primarySports.map(sport => sport.id));
+      const selected = new Set(primarySports.map(sportIdentity));
       const alternatives = [];
       for (const otherType of ranked) {
         if (otherType.id === type.id) continue;
         let added = 0;
         for (const sport of otherType.sports.filter(eligible).sort(byPriority)) {
-          if (!eligible(sport) || selected.has(sport.id)) continue;
-          selected.add(sport.id);
+          const identity = sportIdentity(sport);
+          if (selected.has(identity)) continue;
+          selected.add(identity);
           alternatives.push({ ...sport, typeName: otherType.name, typeId: otherType.id });
           added += 1;
           if (added === 2) break;

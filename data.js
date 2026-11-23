@@ -45,9 +45,31 @@ export const constraints = [
   ] },
 ];
 
-const commonSports = new Set(['stretch', 'taichi', 'yoga', 'bodyweight', 'machines', 'band', 'walk', 'jogging', 'jumprope', 'tabletennis', 'badminton', 'basketball', 'football', 'softvolley', 'dancebasic', 'aerobics', 'squaredance', 'boxingbasic', 'martialforms', 'parkstroll', 'cycling', 'hiking']);
+const commonSports = new Set(['stretch', 'taichi', 'yoga', 'bodyweight', 'machines', 'band', 'jogging', 'jumprope', 'tabletennis', 'badminton', 'basketball', 'football', 'softvolley', 'dancebasic', 'aerobics', 'squaredance', 'boxingbasic', 'martialforms', 'cycling', 'hiking']);
 const specialistSports = new Set(['bouldering', 'toprope', 'waterwalk', 'aquafitness', 'icedancebasic', 'zumba', 'fencing', 'snowshoe', 'crosscountryski']);
-const sport = (id, name, venues, cost, minMinutes, flags, starter, reason) => ({ id, name, venues, cost, minMinutes, flags, starter, reason, priority: commonSports.has(id) ? 0 : specialistSports.has(id) ? 2 : 1 });
+const sportGroups = {
+  mobility: 'stretch',
+  band: 'strength', bodyweight: 'strength', machines: 'strength',
+  walk: 'walking', indoorwalk: 'walking', parkstroll: 'walking', citywalk: 'walking',
+  stationarybike: 'cycling',
+  waterwalk: 'aquafitness',
+  bouldering: 'climbing', toprope: 'climbing',
+  dancewalk: 'aerobics',
+};
+const sportNames = {
+  mobility: '拉伸', stretch: '拉伸', taichi: '太极', yoga: '瑜伽',
+  band: '力量训练', bodyweight: '力量训练', machines: '力量训练',
+  bouldering: '攀岩', toprope: '攀岩',
+  walk: '步行', indoorwalk: '步行', parkstroll: '步行', citywalk: '步行',
+  jogging: '跑步', jumprope: '跳绳', stationarybike: '骑行', cycling: '骑行',
+  swimming: '游泳', waterwalk: '水中健身', aquafitness: '水中健身',
+  skatingbasic: '滑冰', icedancebasic: '冰上舞蹈',
+  tenniswall: '网球', basketball: '篮球', football: '足球', softvolley: '排球', frisbeepass: '飞盘',
+  dancewalk: '健身操', dancebasic: '舞蹈', aerobics: '健身操', squaredance: '广场舞', zumba: '尊巴',
+  boxingbasic: '拳击', martialforms: '武术', taekwondo: '跆拳道', fencing: '击剑',
+  hiking: '徒步', snowshoe: '雪鞋徒步', crosscountryski: '越野滑雪',
+};
+const sport = (id, name, venues, cost, minMinutes, flags, starter, reason) => ({ id, sportId: sportGroups[id] ?? id, name: sportNames[id] ?? name, venues, cost, minMinutes, flags, starter, reason, priority: commonSports.has(id) ? 0 : specialistSports.has(id) ? 2 : 1 });
 const profile = (social, competition, intensity, skill, outdoor, rhythm) => ({ social, competition, intensity, skill, outdoor, rhythm });
 
 export const types = [
@@ -167,20 +189,20 @@ export const types = [
 ];
 
 export const catalog = [
-  { id: 'walking', name: '步行与跑步', sports: ['散步', '健走', '街区步行', '公园漫步', '慢跑', '跑走交替', '田径跑', '越野跑', '定向运动'] },
-  { id: 'strength', name: '力量与体能', sports: ['徒手力量', '弹力带训练', '哑铃训练', '壶铃训练', '固定器械', '杠铃训练', '循环训练', '举重', '力量举'] },
-  { id: 'mobility', name: '舒展与身体控制', sports: ['关节活动', '轻柔拉伸', '太极', '八段锦', '瑜伽', '普拉提', '地面流动', '平衡练习'] },
-  { id: 'racket', name: '球拍运动', sports: ['乒乓球', '羽毛球', '网球', '壁球', '匹克球', '短式网球', '柔力球'] },
-  { id: 'team', name: '团队与传接', sports: ['篮球', '足球', '排球', '软式排球', '气排球', '飞盘', '腰旗橄榄球', '手球', '棒球', '垒球', '曲棍球'] },
-  { id: 'dance', name: '舞蹈与律动', sports: ['跟拍走', '有氧舞蹈', '尊巴', '爵士舞', '街舞', '现代舞', '中国舞', '芭蕾基础', '拉丁舞', '交谊舞', '踢踏舞'] },
-  { id: 'cycling', name: '骑行与轮上活动', sports: ['固定单车', '休闲骑行', '公路骑行', '山地骑行', '轮滑', '滑板', '长板', '小轮车'] },
-  { id: 'water', name: '水上活动', sports: ['游泳', '水中步行', '水中健身', '桨板', '皮划艇', '赛艇', '龙舟', '帆船', '冲浪', '浮潜', '潜水', '自由潜水', '水球', '花样游泳', '滑水', '尾波冲浪', '帆板', '风筝冲浪', '漂流'] },
-  { id: 'precision', name: '技巧与准确性', sports: ['台球', '保龄球', '飞镖', '射箭', '高尔夫', '迷你高尔夫', '地掷球', '门球', '丝巾抛接', '空竹'] },
-  { id: 'outdoor', name: '山野与攀登', sports: ['平地徒步', '山地徒步', '登山', '抱石', '绳索攀岩', '攀树', '溯溪', '洞穴探险'] },
-  { id: 'combat', name: '格斗与对抗', sports: ['拳击', '健身拳击', '散打', '跆拳道', '空手道', '柔道', '巴西柔术', '摔跤', '击剑', '剑道'] },
+  { id: 'walking', name: '步行与跑步', sports: ['步行', '跑步', '越野跑', '定向运动'] },
+  { id: 'strength', name: '力量与体能', sports: ['力量训练', '举重', '力量举'] },
+  { id: 'mobility', name: '舒展与身体控制', sports: ['拉伸', '太极', '八段锦', '瑜伽', '普拉提'] },
+  { id: 'racket', name: '球拍运动', sports: ['乒乓球', '羽毛球', '网球', '壁球', '匹克球', '柔力球'] },
+  { id: 'team', name: '团队与传接', sports: ['篮球', '足球', '排球', '飞盘', '腰旗橄榄球', '手球', '棒球', '垒球', '曲棍球'] },
+  { id: 'dance', name: '舞蹈与律动', sports: ['健身操', '广场舞', '尊巴', '爵士舞', '街舞', '现代舞', '中国舞', '芭蕾', '拉丁舞', '交谊舞', '踢踏舞'] },
+  { id: 'cycling', name: '骑行与轮上活动', sports: ['骑行', '轮滑', '滑板', '小轮车'] },
+  { id: 'water', name: '水上活动', sports: ['游泳', '水中健身', '桨板', '皮划艇', '赛艇', '龙舟', '帆船', '冲浪', '浮潜', '潜水', '自由潜水', '水球', '花样游泳', '滑水', '尾波冲浪', '帆板', '风筝冲浪', '漂流'] },
+  { id: 'precision', name: '技巧与准确性', sports: ['台球', '保龄球', '飞镖', '射箭', '高尔夫', '地掷球', '门球', '空竹'] },
+  { id: 'outdoor', name: '山野与攀登', sports: ['徒步', '登山', '攀岩', '攀树', '溯溪', '洞穴探险'] },
+  { id: 'combat', name: '格斗与对抗', sports: ['拳击', '散打', '跆拳道', '空手道', '柔道', '巴西柔术', '摔跤', '击剑', '剑道'] },
   { id: 'ice', name: '冰上运动', sports: ['滑冰', '花样滑冰', '速度滑冰', '短道速滑', '冰壶', '冰球', '冰上舞蹈'] },
   { id: 'snow', name: '雪上运动', sports: ['双板滑雪', '单板滑雪', '越野滑雪', '雪鞋徒步', '自由式滑雪', '跳台滑雪', '雪橇', '雪车'] },
   { id: 'adaptive', name: '适应性运动', sports: ['坐式体操', '坐式舞蹈', '坐式太极', '轮椅篮球', '轮椅网球', '轮椅羽毛球', '轮椅乒乓球', '坐式排球', '盲人门球', '盲人足球', '硬地滚球', '轮椅竞速', '手摇自行车', '适应性游泳'] },
-  { id: 'motor', name: '机械与马术运动', sports: ['卡丁车', '场地摩托车', '越野摩托车', '汽车场地赛', '汽车拉力赛', '摩托艇', '马术基础骑乘', '马术盛装舞步', '马术障碍赛', '耐力骑乘', '马球'] },
+  { id: 'motor', name: '机械与马术运动', sports: ['卡丁车', '场地摩托车', '越野摩托车', '汽车场地赛', '汽车拉力赛', '摩托艇', '马术', '马术盛装舞步', '马术障碍赛', '耐力骑乘', '马球'] },
 ];
 
